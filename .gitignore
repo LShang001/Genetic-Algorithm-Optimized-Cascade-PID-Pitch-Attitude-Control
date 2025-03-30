@@ -1,0 +1,22 @@
+# MATLAB编译文件
+*.mex*
+*.p
+*.asv
+
+# 临时文件
+*.tmp
+*.bak
+*~
+
+# 数据文件
+*.mat
+*.csv
+*.dat
+
+# 构建目录
+build/
+bin/
+
+# IDE特定文件
+.DS_Store
+.idea/
