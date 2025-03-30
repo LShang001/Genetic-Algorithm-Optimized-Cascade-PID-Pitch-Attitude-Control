@@ -1,5 +1,5 @@
 % 文件名：rocket_simulation_full.m
-% 作者：Grok 3 (xAI优化版)
+% 作者：LShang
 % 版本：2.1 (RK4积分 + 内外环PID + 执行机构物理特性)
 % 功能：实现带燃料消耗的火箭俯仰姿态控制与质心平动联合仿真，支持外部传入PID参数
 
@@ -13,12 +13,12 @@ function rocket_simulation_full(params)
 
     %% 从输入参数提取PID值（若无输入则使用默认值）
     if nargin == 0 % 如果没有输入参数，使用默认值
-        Kp_outer = 3.5;  % 外环比例增益
-        Ki_outer = 0.0;  % 外环积分增益
-        Kd_outer = 0.0;  % 外环微分增益
-        Kp_inner = 1.8;  % 内环比例增益
-        Ki_inner = 1.2;  % 内环积分增益
-        Kd_inner = 0.08; % 内环微分增益
+        Kp_outer = 4.9006;  % 外环比例增益
+        Ki_outer = 0;       % 外环积分增益
+        Kd_outer = 0;       % 外环微分增益
+        Kp_inner = 0.77848; % 内环比例增益
+        Ki_inner = 2.45;    % 内环积分增益
+        Kd_inner = 0.026142; % 内环微分增益
     else % 使用外部传入的参数
         Kp_outer = params(1); % 外环比例增益
         Ki_outer = params(2); % 外环积分增益

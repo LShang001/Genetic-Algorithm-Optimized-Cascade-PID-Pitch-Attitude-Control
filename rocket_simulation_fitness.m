@@ -1,5 +1,5 @@
 % 文件名：rocket_simulation_fitness.m
-% 作者：Grok 3 (xAI优化版)
+% 作者：LShang
 % 功能：简化版火箭仿真，用于遗传算法优化PID参数，计算带超调抑制和控制量变化率惩罚的适应度值
 % 输入：params - PID参数数组 [Kp_outer, Ki_outer, Kd_outer, Kp_inner, Ki_inner, Kd_inner]
 % 输出：fitness - 加权适应度值（RMSE + 超调惩罚 + 控制量变化率惩罚），综合衡量跟踪误差、超调和控制平稳性
