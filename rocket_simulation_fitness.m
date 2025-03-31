@@ -123,7 +123,7 @@ function fitness = rocket_simulation_fitness(params)
     gimbal_to_cg_empty = 0.50; % 空载时万向节到质心距离 (m)
     inertia_full = 2.76;       % 满载时转动惯量 (kg·m²)
     inertia_empty = 2.1;       % 空载时转动惯量 (kg·m²)
-    max_gimbal_angle = 15;     % 万向节最大摆角 (°)
+    max_gimbal_angle = 10;     % 万向节最大摆角 (°)
     max_omega = 80;            % 角速度最大值 (°/s)，限制外环输出
     manual_thrust = 160;       % 固定推力值 (N)，手动设定
     integral_max_outer = 100;  % 外环积分上限，允许较大积分范围
@@ -133,7 +133,7 @@ function fitness = rocket_simulation_fitness(params)
     alpha = 0.3;               % 目标俯仰角滤波系数，平滑目标信号
     alpha_d_outer = 1;         % 外环微分滤波系数，1表示无滤波
     alpha_output_outer = 1;    % 外环输出滤波系数，1表示无滤波
-    alpha_d_inner = 1;         % 内环微分滤波系数，1表示无滤波
+    alpha_d_inner = 0.4;         % 内环微分滤波系数，1表示无滤波
     alpha_output_inner = 1;    % 内环输出滤波系数，1表示无滤波
     delay_time = 0.01;         % 执行机构延迟时间 (s)，模拟机械响应延迟
     delay_steps = round(delay_time / dt_control); % 延迟步数，基于控制周期计算
@@ -141,7 +141,7 @@ function fitness = rocket_simulation_fitness(params)
     alpha_actuator = dt_control / (tau_actuator + dt_control); % 一阶滞后离散系数
 
     % 噪声参数
-    gimbal_angle_error = 0.1;% 万向节角度固定误差 (°)
+    gimbal_angle_error = 0.15;% 万向节角度固定误差 (°)
     gimbal_angle_noise_std = 0.3; % 万向节角度噪声标准差 (°)，增加以模拟扰动
 
     %% 初始化系统

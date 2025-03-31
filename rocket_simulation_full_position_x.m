@@ -15,7 +15,7 @@ function rocket_simulation_full_position_x(position_pid_params)
         try
             loaded_data = load('optimal_position_x_de_params.mat', 'optimal_params');
             % position_pid_params = loaded_data.optimal_params;
-            position_pid_params = [1.5, 0.0, 0.20, 13, 0.0, 0.0];
+            position_pid_params = [1.1, 0.2, 0.00, 13, 0.0, 0.0];
             disp('成功加载优化后的水平位置环PID参数。');
         catch
             warning('无法加载 optimal_position_x_de_params.mat，将使用默认位置环PID参数。');
@@ -30,13 +30,13 @@ function rocket_simulation_full_position_x(position_pid_params)
         att_params = att_data.optimal_params;
         % Kp_outer_att = att_params(1); Ki_outer_att = att_params(2); Kd_outer_att = att_params(3);
         % Kp_inner_att = att_params(4); Ki_inner_att = att_params(5); Kd_inner_att = att_params(6);
-        Kp_outer_att = 4.9006; Ki_outer_att = 0; Kd_outer_att = 0;
-        Kp_inner_att = 0.77848; Ki_inner_att = 2.45; Kd_inner_att = 0.026142;
+        Kp_outer_att = 3.9014; Ki_outer_att = 0; Kd_outer_att = 0;
+        Kp_inner_att = 1.1355; Ki_inner_att = 3.0861; Kd_inner_att = 0.033825;
         disp('成功加载固定的姿态PID参数。');
     catch
         warning('无法加载 optimal_adaptive_de_params.mat，将使用默认姿态PID参数。');
-        Kp_outer_att = 4.9006; Ki_outer_att = 0; Kd_outer_att = 0;
-        Kp_inner_att = 0.77848; Ki_inner_att = 2.45; Kd_inner_att = 0.026142;
+        Kp_outer_att = 3.9014; Ki_outer_att = 0; Kd_outer_att = 0;
+        Kp_inner_att = 1.1355; Ki_inner_att = 3.0861; Kd_inner_att = 0.033825;
     end
 
     % 从输入数组提取水平位置和速度环PID参数

@@ -17,8 +17,8 @@ function fitness = rocket_simulation_fitness_position_x(params)
         % disp('成功加载固定的姿态PID参数。'); % Optional: Keep console clean during optimization
     catch
         warning('无法加载 optimal_adaptive_de_params.mat，将使用默认姿态PID参数。');
-        Kp_outer_att = 4.9006; Ki_outer_att = 0; Kd_outer_att = 0;
-        Kp_inner_att = 0.77848; Ki_inner_att = 2.45; Kd_inner_att = 0.026142;
+        Kp_outer_att = 3.9014; Ki_outer_att = 0; Kd_outer_att = 0;
+        Kp_inner_att = 1.1355; Ki_inner_att = 3.0861; Kd_inner_att = 0.033825;
     end
 
     %% 初始化参数

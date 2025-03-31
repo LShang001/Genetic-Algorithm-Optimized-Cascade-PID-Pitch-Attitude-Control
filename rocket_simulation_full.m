@@ -13,12 +13,12 @@ function rocket_simulation_full(params)
 
     %% 从输入参数提取PID值（若无输入则使用默认值）
     if nargin == 0 % 如果没有输入参数，使用默认值
-        Kp_outer = 4.9006;  % 外环比例增益
-        Ki_outer = 0;       % 外环积分增益
-        Kd_outer = 0;       % 外环微分增益
-        Kp_inner = 0.77848; % 内环比例增益
-        Ki_inner = 2.45;    % 内环积分增益
-        Kd_inner = 0.026142; % 内环微分增益
+        Kp_outer = 3.9014; % 外环比例增益
+        Ki_outer = 0; % 外环积分增益
+        Kd_outer = 0; % 外环微分增益
+        Kp_inner = 1.1355; % 内环比例增益
+        Ki_inner = 3.0861; % 内环积分增益
+        Kd_inner = 0.033825; % 内环微分增益
     else % 使用外部传入的参数
         Kp_outer = params(1); % 外环比例增益
         Ki_outer = params(2); % 外环积分增益
@@ -34,7 +34,7 @@ function rocket_simulation_full(params)
         % 初始化低通滤波器，用于平滑信号
         % 输入：alpha - 滤波系数 (0,1)，值越小滤波越强
         lpf.alpha = alpha; % 保存滤波系数
-        lpf.y_prev = 0;    % 初始化前一输出值为0
+        lpf.y_prev = 0; % 初始化前一输出值为0
     end
 
     % 低通滤波器更新
@@ -48,21 +48,21 @@ function rocket_simulation_full(params)
     function pid = initPIDController(Kp, Ki, Kd, dt, integral_max, integral_min, alpha_d, alpha_output)
         % 初始化PID控制器
         % 输入：Kp, Ki, Kd - 增益；dt - 控制周期；integral_max/min - 积分限幅；alpha_d/output - 滤波系数
-        pid = struct(... % 创建结构体存储PID参数和状态
-            'Kp', Kp,...
-            'Ki', Ki,...
-            'Kd', Kd,...
-            'dt', dt,...
-            'integral', 0,... % 初始积分值为0
-            'prev_error', 0,... % 前一误差值为0
-            'integral_max', integral_max,...
-            'integral_min', integral_min,...
-            'p_list', [],... % 比例项记录
-            'i_list', [],... % 积分项记录
-            'd_list', [],... % 微分项记录
-            'integral_list', [],... % 积分值记录
-            'lpf_d', initLowPassFilter(alpha_d),... % 微分项低通滤波器
-            'lpf_output', initLowPassFilter(alpha_output)... % 输出低通滤波器
+        pid = struct( ... % 创建结构体存储PID参数和状态
+            'Kp', Kp, ...
+            'Ki', Ki, ...
+            'Kd', Kd, ...
+            'dt', dt, ...
+            'integral', 0, ... % 初始积分值为0
+            'prev_error', 0, ... % 前一误差值为0
+            'integral_max', integral_max, ...
+            'integral_min', integral_min, ...
+            'p_list', [], ... % 比例项记录
+            'i_list', [], ... % 积分项记录
+            'd_list', [], ... % 微分项记录
+            'integral_list', [], ... % 积分值记录
+            'lpf_d', initLowPassFilter(alpha_d), ... % 微分项低通滤波器
+            'lpf_output', initLowPassFilter(alpha_output) ... % 输出低通滤波器
         );
     end
 
@@ -82,10 +82,10 @@ function rocket_simulation_full(params)
         pid.lpf_output = updateLowPassFilter(pid.lpf_output, control); % 滤波总输出
         control_filtered = pid.lpf_output.y_prev; % 获取滤波后的控制输出
         pid.prev_error = error; % 保存当前误差
-        pid.p_list(end+1) = P; % 记录比例项
-        pid.i_list(end+1) = I; % 记录积分项
-        pid.d_list(end+1) = D; % 记录微分项
-        pid.integral_list(end+1) = pid.integral; % 记录积分值
+        pid.p_list(end + 1) = P; % 记录比例项
+        pid.i_list(end + 1) = I; % 记录积分项
+        pid.d_list(end + 1) = D; % 记录微分项
+        pid.integral_list(end + 1) = pid.integral; % 记录积分值
     end
 
     % RK4动力学更新
@@ -94,19 +94,18 @@ function rocket_simulation_full(params)
         % 输入：state - 当前状态向量，thrust - 推力，gimbal_angle - 摆角，mass - 质量，inertia - 转动惯量，gimbal_to_cg - 质心距离，dt - 时间步长
         % 输出：state_next - 更新后的状态，pitch_acceleration - 角加速度
         function dxdt = dynamics(x, thrust, gimbal_angle, mass, inertia, gimbal_to_cg)
-            theta = x(1);    % 俯仰角 (°)，逆时针为正（x轴正方向向左）
+            theta = x(1); % 俯仰角 (°)，逆时针为正（x轴正方向向左）
             omega = x(2);
-            x_vel = x(4);    % x速度：正为左
-            y_vel = x(6);    % y速度：正为上
+            x_vel = x(4); % x速度：正为左
+            y_vel = x(6); % y速度：正为上
 
             % 推力方向（x轴正方向向左）
             thrust_angle = theta - gimbal_angle;
             thrust_x = -thrust * sind(thrust_angle); % 正为左
-            thrust_y = thrust * cosd(thrust_angle);  % 正为上
+            thrust_y = thrust * cosd(thrust_angle); % 正为上
 
             acc_x = thrust_x / mass;
             acc_y = (thrust_y - 9.81 * mass) / mass;
-
 
             % 力矩计算（顺时针摆角产生逆时针力矩）
             torque = thrust * gimbal_to_cg * sind(gimbal_angle); % 正力矩
@@ -117,56 +116,56 @@ function rocket_simulation_full(params)
 
         % RK4积分
         k1 = dynamics(state, thrust, gimbal_angle, mass, inertia, gimbal_to_cg);
-        k2 = dynamics(state + dt/2*k1, thrust, gimbal_angle, mass, inertia, gimbal_to_cg);
-        k3 = dynamics(state + dt/2*k2, thrust, gimbal_angle, mass, inertia, gimbal_to_cg);
-        k4 = dynamics(state + dt*k3, thrust, gimbal_angle, mass, inertia, gimbal_to_cg);
+        k2 = dynamics(state + dt / 2 * k1, thrust, gimbal_angle, mass, inertia, gimbal_to_cg);
+        k3 = dynamics(state + dt / 2 * k2, thrust, gimbal_angle, mass, inertia, gimbal_to_cg);
+        k4 = dynamics(state + dt * k3, thrust, gimbal_angle, mass, inertia, gimbal_to_cg);
 
-        state_next = state + dt/6*(k1 + 2*k2 + 2*k3 + k4);
+        state_next = state + dt / 6 * (k1 + 2 * k2 + 2 * k3 + k4);
         torque = -thrust * gimbal_to_cg * sind(gimbal_angle);
         pitch_acceleration = rad2deg(torque / inertia);
     end
 
     %% 主程序参数配置
     % 仿真参数
-    dt_control = 0.004;      % 控制周期 (s)，250Hz
-    dt_dynamics = 0.001;    % 动力学更新步长 (s)，1kHz
-    time_duration = 12;      % 仿真总时长 (s)
+    dt_control = 0.004; % 控制周期 (s)，250Hz
+    dt_dynamics = 0.001; % 动力学更新步长 (s)，1kHz
+    time_duration = 12; % 仿真总时长 (s)
     control_steps = ceil(time_duration / dt_control); % 总控制步数
 
     % 火箭参数
-    initial_mass = 15.8;     % 初始质量 (kg)
-    fuel_mass = 3.0;         % 初始燃料质量 (kg)
-    empty_mass = 12.8;       % 空载质量 (kg)
-    max_thrust = 200;        % 最大推力 (N)
+    initial_mass = 15.8; % 初始质量 (kg)
+    fuel_mass = 3.0; % 初始燃料质量 (kg)
+    empty_mass = 12.8; % 空载质量 (kg)
+    max_thrust = 200; % 最大推力 (N)
     max_mass_flow_rate = 0.12; % 最大质量流率 (kg/s)
     gimbal_to_cg_full = 0.58; % 满载时质心距离 (m)
-    gimbal_to_cg_empty = 0.50;% 空载时质心距离 (m)
-    inertia_full = 2.76;     % 满载时转动惯量 (kg·m²)
-    inertia_empty = 2.1;     % 空载时转动惯量 (kg·m²)
-    max_gimbal_angle = 15;   % 最大摆角 (°)
-    max_omega = 80;            % 外环输出最大角速度
-    manual_thrust = 160;     % 固定推力 (N)
+    gimbal_to_cg_empty = 0.50; % 空载时质心距离 (m)
+    inertia_full = 2.76; % 满载时转动惯量 (kg·m²)
+    inertia_empty = 2.1; % 空载时转动惯量 (kg·m²)
+    max_gimbal_angle = 10; % 最大摆角 (°)
+    max_omega = 80; % 外环输出最大角速度
+    manual_thrust = 160; % 固定推力 (N)
 
     % 控制参数（内外环PID）
     integral_max_outer = 100; integral_min_outer = -100; % 外环积分限幅
     integral_max_inner = 100; integral_min_inner = -100; % 内环积分限幅
-    alpha = 0.3;            % 目标俯仰角滤波系数
-    alpha_d_outer = 1;      % 外环微分滤波系数
+    alpha = 0.3; % 目标俯仰角滤波系数
+    alpha_d_outer = 1; % 外环微分滤波系数
     alpha_output_outer = 1; % 外环输出滤波系数
-    alpha_d_inner = 1;    % 内环微分滤波系数
+    alpha_d_inner = 1; % 内环微分滤波系数
     alpha_output_inner = 1; % 内环输出滤波系数
 
     % 执行机构参数
-    delay_time = 0.01;       % 执行机构延迟时间 (s)
+    delay_time = 0.01; % 执行机构延迟时间 (s)
     delay_steps = round(delay_time / dt_control); % 延迟步数
-    tau_actuator = 0.05;     % 执行机构时间常数 (s)
+    tau_actuator = 0.05; % 执行机构时间常数 (s)
     alpha_actuator = dt_control / (tau_actuator + dt_control); % 一阶滞后系数
 
     % 噪声参数
-    gimbal_angle_error = 0.0; % 万向节角度固定误差 (°)
-    gimbal_angle_noise_std = 0.0; % 万向节角度噪声标准差 (°)
+    gimbal_angle_error = 0.00; % 万向节角度固定误差 (°)
+    gimbal_angle_noise_std = 0.00; % 万向节角度噪声标准差 (°)
     sensor_noise_std = 0.00; % 传感器角度噪声标准差 (°)
-    sensor_rate_noise_std = 0.0; % 传感器角速度噪声标准差 (°/s)
+    sensor_rate_noise_std = 0.00; % 传感器角速度噪声标准差 (°/s)
 
     %% 初始化系统
     % 初始化PID控制器和滤波器
@@ -207,12 +206,12 @@ function rocket_simulation_full(params)
     pitch_acceleration_list = [];
 
     % 系统初始状态
-    current_pitch_angle = 0;       % 初始俯仰角 (°)
-    current_pitch_rate = 0;        % 初始角速度 (°/s)
-    x_position = 0;          % 初始水平位置 (m)
-    y_position = 0;          % 初始竖直位置 (m)
-    x_velocity = 0;          % 初始水平速度 (m/s)
-    y_velocity = 0;          % 初始竖直速度 (m/s)
+    current_pitch_angle = 0; % 初始俯仰角 (°)
+    current_pitch_rate = 0; % 初始角速度 (°/s)
+    x_position = 0; % 初始水平位置 (m)
+    y_position = 0; % 初始竖直位置 (m)
+    x_velocity = 0; % 初始水平速度 (m/s)
+    y_velocity = 0; % 初始竖直速度 (m/s)
     current_mass = initial_mass;
     current_inertia = inertia_full;
     current_gimbal_to_cg = gimbal_to_cg_full;
@@ -230,10 +229,10 @@ function rocket_simulation_full(params)
 
     while t < time_duration
         % 控制更新（250Hz）
-        if step <= control_steps && abs(t - (step-1)*dt_control) < 1e-10
+        if step <= control_steps && abs(t - (step - 1) * dt_control) < 1e-10
             t_control = (step - 1) * dt_control;
             % 生成目标俯仰角：前6秒5°，后6秒0°
-            target_pitch_angle = 5*(t_control<6) + 0*(t_control>=6);
+            target_pitch_angle = 5 * (t_control < 6) + 0 * (t_control >= 6);
             lpf = updateLowPassFilter(lpf, target_pitch_angle);
             filtered_target_pitch_angle = lpf.y_prev;
 
@@ -248,7 +247,7 @@ function rocket_simulation_full(params)
             % 外环PID：计算角速度指令
             theta_error = filtered_target_pitch_angle - current_pitch_angle_measured;
             [pid_outer, omega_ref] = updatePIDController(pid_outer, theta_error);
-            omega_ref= max(min(omega_ref, max_omega), -max_omega);
+            omega_ref = max(min(omega_ref, max_omega), -max_omega);
 
             % 内环PID：计算万向节角度
             omega_error = omega_ref - current_pitch_rate_measured;
@@ -256,7 +255,7 @@ function rocket_simulation_full(params)
 
             % 执行机构延迟与滞后
             current_gimbal_angle = max(min(control, max_gimbal_angle), -max_gimbal_angle);
-            gimbal_angle_buffer = [current_gimbal_angle, gimbal_angle_buffer(1:end-1)];
+            gimbal_angle_buffer = [current_gimbal_angle, gimbal_angle_buffer(1:end - 1)];
             current_gimbal_angle_delayed = gimbal_angle_buffer(end);
             current_gimbal_angle_actual = (1 - alpha_actuator) * current_gimbal_angle_actual + ...
                 alpha_actuator * current_gimbal_angle_delayed;
@@ -288,16 +287,16 @@ function rocket_simulation_full(params)
 
         % 计算燃料消耗
         if fuel_mass > 0
-            current_mass_flow_rate = max_mass_flow_rate * (manual_thrust/max_thrust);
+            current_mass_flow_rate = max_mass_flow_rate * (manual_thrust / max_thrust);
             fuel_mass = fuel_mass - current_mass_flow_rate * dt_dynamics;
             fuel_mass = max(fuel_mass, 0);
             current_mass = empty_mass + fuel_mass;
         end
 
         % 根据燃料消耗插值质心位置和转动惯量
-        mass_ratio = (initial_mass - current_mass)/(initial_mass - empty_mass);
-        current_gimbal_to_cg = gimbal_to_cg_full - mass_ratio*(gimbal_to_cg_full - gimbal_to_cg_empty);
-        current_inertia = inertia_full - mass_ratio*(inertia_full - inertia_empty);
+        mass_ratio = (initial_mass - current_mass) / (initial_mass - empty_mass);
+        current_gimbal_to_cg = gimbal_to_cg_full - mass_ratio * (gimbal_to_cg_full - gimbal_to_cg_empty);
+        current_inertia = inertia_full - mass_ratio * (inertia_full - inertia_empty);
 
         % 使用RK4更新动力学状态
         [state, current_pitch_acceleration] = updateDynamicsRK4(state, manual_thrust, ...
@@ -312,12 +311,12 @@ function rocket_simulation_full(params)
         y_velocity = state(6);
 
         % 存储动力学数据
-        time_list(end+1) = t;
-        x_position_list(end+1) = x_position;
-        y_position_list(end+1) = y_position;
-        x_velocity_list(end+1) = x_velocity;
-        y_velocity_list(end+1) = y_velocity;
-        pitch_acceleration_list(end+1) = current_pitch_acceleration;
+        time_list(end + 1) = t;
+        x_position_list(end + 1) = x_position;
+        y_position_list(end + 1) = y_position;
+        x_velocity_list(end + 1) = x_velocity;
+        y_velocity_list(end + 1) = y_velocity;
+        pitch_acceleration_list(end + 1) = current_pitch_acceleration;
 
         % 时间推进
         t = t_next;
@@ -328,7 +327,7 @@ function rocket_simulation_full(params)
         'Position', [100 100 1200 900], 'Color', 'w');
 
     % 俯仰角跟踪性能
-    subplot(3,3,1);
+    subplot(3, 3, 1);
     plot(time_list_control, pitch_angle_list_control, 'b', 'LineWidth', 1.5);
     hold on;
     plot(time_list_control, pitch_angle_measured_list_control, 'Color', [1 0.5 0], 'LineWidth', 1);
@@ -340,14 +339,14 @@ function rocket_simulation_full(params)
     grid on;
 
     % 控制误差分析（外环）
-    subplot(3,3,2);
+    subplot(3, 3, 2);
     plot(time_list_control, error_outer_list_control, 'r', 'LineWidth', 1.5);
     title('外环控制误差分析');
     xlabel('时间 (s)'); ylabel('误差 (°)');
     grid on;
 
     % 发动机摆角响应
-    subplot(3,3,4);
+    subplot(3, 3, 4);
     plot(time_list_control, gimbal_angle_list_control, 'g', 'LineWidth', 1.5);
     hold on;
     plot(time_list_control, gimbal_angle_actual_list_control, 'Color', [1 0.5 0], 'LineWidth', 1);
@@ -357,35 +356,35 @@ function rocket_simulation_full(params)
     grid on;
 
     % 质心水平位置
-    subplot(3,3,8);
+    subplot(3, 3, 8);
     plot(time_list, x_position_list, 'b', 'LineWidth', 1.5);
     title('质心水平位置');
     xlabel('时间 (s)'); ylabel('位置 (m)');
     grid on;
 
     % 质心竖直位置
-    subplot(3,3,5);
+    subplot(3, 3, 5);
     plot(time_list, y_position_list, 'r', 'LineWidth', 1.5);
     title('质心竖直位置');
     xlabel('时间 (s)'); ylabel('位置 (m)');
     grid on;
 
     % 质心水平速度
-    subplot(3,3,6);
+    subplot(3, 3, 6);
     plot(time_list, x_velocity_list, 'g', 'LineWidth', 1.5);
     title('质心水平速度');
     xlabel('时间 (s)'); ylabel('速度 (m/s)');
     grid on;
 
     % 质心竖直速度
-    subplot(3,3,7);
+    subplot(3, 3, 7);
     plot(time_list, y_velocity_list, 'm', 'LineWidth', 1.5);
     title('质心竖直速度');
     xlabel('时间 (s)'); ylabel('速度 (m/s)');
     grid on;
 
     % 角速度跟踪性能
-    subplot(3,3,3);
+    subplot(3, 3, 3);
     plot(time_list_control, pitch_rate_list_control, 'b', 'LineWidth', 1.5);
     hold on;
     plot(time_list_control, omega_ref_list_control, '--r', 'LineWidth', 1.5);
@@ -395,7 +394,7 @@ function rocket_simulation_full(params)
     grid on;
 
     % 质心位置变化
-    subplot(3,3,9);
+    subplot(3, 3, 9);
     plot(time_list_control, mass_list_control, 'Color', [0 0.5 0.5], 'LineWidth', 1.5);
     title('火箭质量变化');
     xlabel('时间 (s)'); ylabel('质量(kg)');
@@ -404,6 +403,6 @@ function rocket_simulation_full(params)
     sgtitle('火箭俯仰姿态与质心平动联合仿真结果 (RK4 + 内外环PID + 执行机构延迟与滞后)', 'FontSize', 16);
 
     % 计算并显示均方误差（RMSE）
-    rmse = sqrt(mean(error_outer_list_control.^2));
+    rmse = sqrt(mean(error_outer_list_control .^ 2));
     disp(['角度跟踪均方误差 (RMSE): ', num2str(rmse), '°']);
 end
