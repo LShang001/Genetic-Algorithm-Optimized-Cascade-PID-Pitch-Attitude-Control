@@ -15,7 +15,7 @@ function rocket_simulation_full_position_x(position_pid_params)
         try
             loaded_data = load('optimal_position_x_de_params.mat', 'optimal_params');
             % position_pid_params = loaded_data.optimal_params;
-            position_pid_params = [1.1, 0.2, 0.00, 13, 0.0, 0.0];
+            position_pid_params = [1.4, 0.0, 0.00, 13, 0.0, 0.0];
             disp('成功加载优化后的水平位置环PID参数。');
         catch
             warning('无法加载 optimal_position_x_de_params.mat，将使用默认位置环PID参数。');
@@ -86,11 +86,11 @@ function rocket_simulation_full_position_x(position_pid_params)
     % 执行机构参数
     delay_time = 0.01; % 执行机构延迟时间 (s)
     delay_steps = round(delay_time / dt_control); % 延迟步数
-    tau_actuator = 0.05; % 执行机构时间常数 (s)
+    tau_actuator = 0.08; % 执行机构时间常数 (s)
     alpha_actuator = dt_control / (tau_actuator + dt_control); % 一阶滞后系数
 
     % 噪声参数
-    gimbal_angle_error = 0.0; % 万向节角度固定误差 (°)
+    gimbal_angle_error = 0.20; % 万向节角度固定误差 (°)
     gimbal_angle_noise_std = 0.0; % 万向节角度噪声标准差 (°)
     sensor_noise_std = 0.0; % 传感器角度噪声标准差 (°)
     sensor_rate_noise_std = 0.0; % 传感器角速度噪声标准差 (°/s)
