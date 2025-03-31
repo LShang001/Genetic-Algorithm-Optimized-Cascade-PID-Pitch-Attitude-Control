@@ -143,7 +143,7 @@ function rocket_simulation_full(params)
     gimbal_to_cg_empty = 0.50;% 空载时质心距离 (m)
     inertia_full = 2.76;     % 满载时转动惯量 (kg·m²)
     inertia_empty = 2.1;     % 空载时转动惯量 (kg·m²)
-    max_gimbal_angle = 15;   % 最大摆角 (°)
+    max_gimbal_angle = 10;   % 最大摆角 (°)
     max_omega = 80;            % 外环输出最大角速度
     manual_thrust = 160;     % 固定推力 (N)
 
@@ -163,10 +163,10 @@ function rocket_simulation_full(params)
     alpha_actuator = dt_control / (tau_actuator + dt_control); % 一阶滞后系数
 
     % 噪声参数
-    gimbal_angle_error = 0.0; % 万向节角度固定误差 (°)
-    gimbal_angle_noise_std = 0.0; % 万向节角度噪声标准差 (°)
+    gimbal_angle_error = 0.00; % 万向节角度固定误差 (°)
+    gimbal_angle_noise_std = 0.00; % 万向节角度噪声标准差 (°)
     sensor_noise_std = 0.00; % 传感器角度噪声标准差 (°)
-    sensor_rate_noise_std = 0.0; % 传感器角速度噪声标准差 (°/s)
+    sensor_rate_noise_std = 0.00; % 传感器角速度噪声标准差 (°/s)
 
     %% 初始化系统
     % 初始化PID控制器和滤波器
