@@ -15,7 +15,7 @@ function rocket_simulation_full_position_x(position_pid_params)
         try
             loaded_data = load('optimal_position_x_de_params.mat', 'optimal_params');
             % position_pid_params = loaded_data.optimal_params;
-            position_pid_params = [1.4, 0.0, 0.00, 13, 0.0, 0.0];
+            position_pid_params = [1.2, 0.0, 0.00, 13, 0.0, 0.0];
             disp('成功加载优化后的水平位置环PID参数。');
         catch
             warning('无法加载 optimal_position_x_de_params.mat，将使用默认位置环PID参数。');
